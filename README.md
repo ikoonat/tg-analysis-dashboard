@@ -1,19 +1,29 @@
 ### `TG-ANALYSIS-DASHBOARD`
 telegram snowball sampling process that allows you to pull text, links, and shares/interactions between channels- do a little python based sentiment analysis with that stuff as a treat &amp; then throw it onto an easy to configure dashboard to show your friends!
 
+---
 # 🐈‍⬛ Get in loser, we're going Spelunking through Telegram
-## ✨ What is this?
-This repository contains **two connected projects** that work together:
-
+**✨ What is this?** This repository contains **two connected projects** that work together:
 | 🐍 **`TELEGRAM-COLLECTOR`** | Collects public Telegram channel data, processes messages, analyzes language and emotion, and exports datasets. |
 | 🕸️ **`TELEGRAM-NETWORK-ANALYSIS`** | Turns your dataset into a modular browser-based network map in a dashboard. you can put pretty much anywhere!|
 
 ---
+## 📋 Table of Contents
+
+- [Introduction](#Introduction)
+- [Telegram Collector Requirements](#Requirements)
+    - [Running the Collector](#Telegram-Collector-Basics)
+- [Telegram Network Analysis Requirements](#Telegram-Network-Analysis-Requirements) 
+    - [Running The Dashboard](#Telegram-Analysis-Basics)
+- [Project Structure](#project-structure)
+- [Features Guide](#features-guide)
+- [FAQ & Troubleshooting](#FAQ-and-Troubleshooting)
+- [Credits & Thanks](#toolsused)
 
 
-
-
-# 🐍 Part I — Telegram Collector
+---
+## Introduction
+### 🐍 Part I — Telegram Collector
 The collector is the data gathering and analysis engine.
 It can:
 - connect to Telegram using your API credentials
@@ -24,7 +34,7 @@ It can:
 - generate word clouds by language and channel
 - save per-channel summaries and output files, including outbound links
 
-# 🕸️ Part II — Telegram Network Analysis
+### 🐛 Part II — Telegram Network Analysis
 This is the Visualization Component 
 It can:
 - take the data you sampled & put it into an interactive dashboard
@@ -35,6 +45,7 @@ It can:
 ---
 
 ## Requirements
+
 ### For the Telegram Collector
 ```txt You need:
 - Python 3.11+
@@ -69,12 +80,11 @@ channel_one
 ```
 
 ## Step 3: Start it up!
-
 Run:
 ```powershell
 .\run-collector.ps1
 ```
-
+## Telegram-Collector-Basics
 The program will ask questions. Press **Enter** to accept the default shown in parentheses.
 1. **Message limit:** how many messages to read from each channel. Start with `100` for a small test, or press Enter for `all`.
 2. **Year:** enter a year such as `2024`, or press Enter to include all years.
@@ -94,7 +104,7 @@ When the message limit is set to `all`, the display shows the number of messages
 On the first run, Telegram may ask for a login code sent to your phone. Enter the code in PowerShell. Telegram may also ask for your two-step verification password.
 Keep PowerShell open until the program says **Collection complete!** You can stop it with `Ctrl+C`; the program will try to save the data before exiting.
 
-## Telegram rate limits
+### Telegram rate limits
 The collector is deliberately slow to reduce pressure on Telegram:
 - It waits between direct API requests and message processing.
 - It waits several seconds between channel histories.
@@ -104,7 +114,6 @@ Do not run multiple collector copies with the same Telegram account at the same 
 For a quick run without incremental backup files, start the collector with:
 
 ## Where the results go
-
 The program saves files in the `./TELEGRAM-COLLECTOR/output` folder:
 - `telegram_shares.csv`: relationships between channels
 - `messages_data.csv`: analyzed messages
@@ -124,136 +133,49 @@ After the first setup, make sure `.env` and `reconlist.txt` are still in this fo
 ```
 
 
+---
+## Telegram-Network-Analysis-Requirements
+The dashboard is a Node application. Its JavaScript packages are installed locally in this folder with npm. The optional `.venv`
+folder is kept separate for any Python tools and is not used for the dashboard's JavaScript packages.
 
+Install these programs on Windows before starting:
+- Node.js 20.19 or newer, up to 24.11.1: <https://nodejs.org/>
+- Windows PowerShell
 
-#### Node.js requirements
-
-From the `TELEGRAM-NETWORK-ANALYSIS` folder:
-
-```powershell
-cd .\TELEGRAM-NETWORK-ANALYSIS
-node --version
-npm --version
-npm install
-```
-
-Or, if the project includes a setup script:
-
+1. Open PowerShell in this folder and run the install script.
 ```powershell
 cd .\TELEGRAM-NETWORK-ANALYSIS
 .\setup-node.ps1
 ```
+This checks Node.js and npm, creates the local Python `.venv`, and installs the dashboard packages into the local `node_modules` folder.
+If Windows blocks the script, run this once in the same PowerShell window, then repeat the setup command:
 
-If PowerShell blocks script execution for the first time, run:
+2. Copy the main data file
+Copy the entire snowball sample you ran earlier (located here: `./TELEGRAM-COLLECTOR/output` ) and place the contents, including subfolders, csv files and json files.
+place those files here `./TELEGRAM-NETWORK-ANALYSIS/public/data` 
 
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-```
-
----
-
-
-### Install the Python environment
-From the collector directory:
-```powershell
-cd .\TELEGRAM-COLLECTOR
-
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-```
-
-If the project includes the setup script, you can use:
-
-```powershell
-cd .\TELEGRAM-COLLECTOR
-.\setup-venv.ps1
-```
-
-That creates the local `.venv` and installs the Python requirements automatically.
-
----
-
-## 🟢 Node.js Dashboard
-
-From the analysis directory:
-
-```powershell
-cd .\TELEGRAM-NETWORK-ANALYSIS
-
-node --version
-npm --version
-
-npm install
-```
-
-Or use:
-
-```powershell
-.\setup-node.ps1
-```
-
-If PowerShell blocks script execution for the first time:
-
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-```
-
----
-
-# 🔐 Telegram API Setup
-
-## 1. Create your `.env`
-
-Inside:
-
+The dashboard expects the files precisely in this location:
 ```text
-TELEGRAM-COLLECTOR/
+./TELEGRAM-NETWORK-ANALYSIS/public/data/telegram_shares.csv
 ```
 
-create a file named:
-
+Ensure you also grab the subfolders `per_channel` 
 ```text
-.env
+./TELEGRAM-NETWORK-ANALYSIS/public/data/per_channel/{channel name}
 ```
 
-Add your Telegram credentials:
 
-```env
-TELEGRAM_API_ID=your_api_id
-TELEGRAM_API_HASH=your_api_hash
-TELEGRAM_PHONE=+1234567890
-```
-
-If you don't have a template, copy `.env_demo` and rename it to `.env`.
-
-### 🚨 PLEASE DO NOT COMMIT THIS FILE
-
-Your `.env` contains private credentials.
-
-**Do not upload it to GitHub.**
-
-Also keep the following local:
-
-- `.env`
-- `.venv`
-- Telegram session files
-- API credentials
 
 ---
+
 
 # 🗂️ Choosing Channels
-
 Open:
-
 ```text
 TELEGRAM-COLLECTOR/reconlist.txt
 ```
 
 Add one Telegram channel per line.
-
 For example:
 
 ```text
@@ -267,7 +189,6 @@ Nice and simple. No fancy formatting required.
 ---
 
 # 🚀 Running the Collector
-
 ## Step 1 — Set everything up
 
 ```powershell
@@ -276,14 +197,12 @@ cd .\TELEGRAM-COLLECTOR
 ```
 
 ## Step 2 — Start collecting
-
 ```powershell
 cd .\TELEGRAM-COLLECTOR
 .\run-collector.ps1
 ```
 
 The collector will guide you through several options, including:
-
 - 📨 Message limit
 - 📅 Year / date filter
 - 🔁 Minimum forwards threshold
@@ -346,45 +265,30 @@ The collector is intentionally **conservative and slow** to reduce the likelihoo
 ---
 
 # 🗃️ IMPORTANT: Save Your Outputs
-
 When you've completed a run, **move the contents of `output/` somewhere safe and label the run** before starting another large collection.
 
 For example:
-
 ```text
 usernamecoolguy-network-5iterations/
 ```
-
 This lets you keep separate snapshots of your research rather than accidentally overwriting your previous dataset.
-
-Because apparently data hoarding is a feature. 📦🐀
 
 ---
 
+
+
+
 # 🕸️ Running the Network Dashboard
-
-Once you've collected some data, it's time to make the graph go brrrr.
-
-## 1. Open the dashboard
-
 ```powershell
 cd .\TELEGRAM-NETWORK-ANALYSIS
 ```
 
-## 2. Install dependencies
-
-```powershell
-npm install
-```
-
-Or:
-
+## 2. Install dependencies & Set up Node
 ```powershell
 .\setup-node.ps1
 ```
 
 ---
-
 ## 3. Copy the graph data
 
 The dashboard expects data in:
@@ -423,16 +327,12 @@ This should start the local development server, usually at:
 http://localhost:5173/
 ```
 
-Open that address in your browser.
+Open that address in your browser, and you should see it populate!
 
-🎉 **Congratulations. You have entered the rabbit hole.**
 
 ---
-
 # 🔎 Exploring the Dashboard
-
 Once it's running, you can:
-
 - 🕸️ View channel relationships as a graph
 - 🖱️ Click nodes to inspect individual channels
 - 📨 Inspect message and forwarding patterns
@@ -443,59 +343,14 @@ Once it's running, you can:
 
 ---
 
-# 🔄 Updating the Dashboard
-
-After collecting a new dataset, copy the new relationship data over:
-
-```powershell
-Copy-Item ..\TELEGRAM-COLLECTOR\output\telegram_shares.csv .\public\data\telegram_shares.csv -Force
-```
-
-Then refresh the browser.
-
-For per-channel updates:
-
-```powershell
-Copy-Item ..\TELEGRAM-COLLECTOR\output\per_channel\* .\public\data\per_channel\ -Recurse -Force
-```
-
----
-
-# 🧭 Recommended Workflow
-
-For a normal run:
-
-```text
-1. 🔐 Create TELEGRAM-COLLECTOR/.env
-          ↓
-2. 📝 Add target channels to reconlist.txt
-          ↓
-3. 🐍 Run the collector
-          ↓
-4. 📦 Save and label your output dataset
-          ↓
-5. 📄 Copy CSV / channel data into public/data
-          ↓
-6. 🕸️ Start the dashboard
-          ↓
-7. 🔎 Explore the network
-          ↓
-8. 🧠 Discover something interesting
-          ↓
-9. 🐈‍⬛ Go back down the rabbit hole
-```
 
 ---
 
 # ⚡ Quick Start
-
 ## 🐍 Collector
-
 ```powershell
 cd .\TELEGRAM-COLLECTOR
-
 .\setup-venv.ps1
-
 .\run-collector.ps1
 ```
 
@@ -503,9 +358,7 @@ cd .\TELEGRAM-COLLECTOR
 
 ```powershell
 cd .\TELEGRAM-NETWORK-ANALYSIS
-
 npm install
-
 npm run dev
 ```
 
@@ -517,9 +370,8 @@ http://localhost:5173/
 
 ---
 
-# ⚠️ Important Notes
+## ⚠️ FAQ-and-Troubleshooting
 Please keep these things in mind:
-
 -  **Never commit `.env` or Telegram API credentials.**
 -  Keep `.venv` local.
 -  Keep Telegram session files private.
@@ -529,6 +381,52 @@ Please keep these things in mind:
 -  **Dashboard = visualization layer**
 
 ---
+
+## ⚠️ Troubleshooting
+### The page says that no data is available
+
+Check that this file exists and is named exactly:
+
+```text
+public\data\telegram_shares.csv
+```
+
+Also check that it contains the collector columns beginning with `From_Channel_ID`, `From_Channel_Username`, `To_Channel_ID`, and `To_Channel_Username`.
+
+### `npm` or `node` is not recognized
+
+Install Node.js, close PowerShell, open a new PowerShell window, and check:
+
+```powershell
+node --version
+npm --version
+```
+
+Then run `.\setup-node.ps1` again.
+### The dashboard dependencies are broken
+
+From this folder, run:
+```powershell
+npm install
+npm run dev
+```
+
+### PowerShell will not run a script
+Run this temporary permission command, then retry the script:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+## Useful commands
+```powershell
+npm run dev       # Start the dashboard for local use
+npm run build     # Check that a production build succeeds
+npm run preview   # Preview the production build
+npm run storybook # Open the component workshop
+
+
+```
 
 # Summary
 
@@ -609,6 +507,6 @@ TG-ANALYSIS-DASHBOARD/
 │
 ├── 📖 README.md
 └── ...
-
+```
 
 </p>
