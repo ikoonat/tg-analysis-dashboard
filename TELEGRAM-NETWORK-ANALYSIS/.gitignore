@@ -1,0 +1,25 @@
+# Local Python / Node envs
+.venv/
+venv/
+node_modules/
+dist/
+__pycache__/
+*.py[cod]
+*.pyc
+pycache/
+
+# Local secrets and session data
+.env
+.env.*
+*.session
+
+# Generated data from Telegram collection / local analysis
+public/data/per_channel/
+public/data/*.csv
+public/data/**/*.csv
+public/data/*.json
+public/data/**/*.json
+
+# Common noise
+*.log
+.DS_Store

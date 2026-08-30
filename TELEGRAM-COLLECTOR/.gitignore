@@ -1,0 +1,36 @@
+# Local Python environment
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Local credentials / secrets
+.env
+.env.*
+!.env_demo
+*.session
+session_name
+
+# Generated collector output and local artifacts
+output/
+output/**
+reconlist.txt
+
+# Font assets are source files; keep only the project fonts, not generated cache
+fonts/*.ttf
+fonts/*.otf
+
+# Common local tooling noise
+node_modules/
+dist/
+.DS_Store
+*.log
+.storybook-static
+
+# Node version files
+.node-version
+
+# NVM
+.nvmrc.bak
+
